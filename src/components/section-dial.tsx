@@ -1,16 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { navigation } from "@/lib/profile";
 import { usePortfolioView } from "@/components/portfolio-view";
+import { navigation } from "@/lib/profile";
 
+const center = 50;
 const orbit = 32;
-const knobTravel = 13;
-const knobRadius = 10;
-const commitDelay = 1000;
+const reach = 22;
+const dead = 11;
+const commitMs = 1000;
 
-function sectorIndex(x: number, y: number, limit: number) {
-  if (Math.hypot(x, y) < limit) {
+function angleOf(index: number) {
+  return -Math.PI / 2 + (index * Math.PI * 2) / navigation.length;
+}
+
+function sectorOf(x: number, y: number) {
+  if (Math.hypot(x, y) < dead) {
     return null;
   }
   const step = (Math.PI * 2) / navigation.length;
@@ -19,173 +24,218 @@ function sectorIndex(x: number, y: number, limit: number) {
   return Math.round(normalized / step) % navigation.length;
 }
 
-function angleOf(index: number) {
-  return -Math.PI / 2 + (index * Math.PI * 2) / navigation.length;
+function clampReach(x: number, y: number) {
+  const distance = Math.hypot(x, y);
+  if (distance <= reach) {
+    return { x, y };
+  }
+  const scale = reach / distance;
+  return { x: x * scale, y: y * scale };
+}
+
+function at(index: number) {
+  const angle = angleOf(index);
+  return { x: Math.cos(angle) * reach, y: Math.sin(angle) * reach };
+}
+
+function settledIndex(activeId: string | null) {
+  if (activeId == null) {
+    return null;
+  }
+  const index = navigation.findIndex((item) => item.href.slice(1) === activeId);
+  return index < 0 ? null : index;
+}
+
+function readVector(event: React.PointerEvent<HTMLDivElement>) {
+  const bounds = event.currentTarget.getBoundingClientRect();
+  return {
+    x: ((event.clientX - bounds.left) / bounds.width) * 100 - center,
+    y: ((event.clientY - bounds.top) / bounds.height) * 100 - center,
+  };
 }
 
 export function SectionDial() {
-  const { openSection } = usePortfolioView();
-  const [active, setActive] = useState<number | null>(null);
-  const [pull, setPull] = useState({ x: 0, y: 0 });
-  const drag = useRef(-1);
-  const choice = useRef<number | null>(null);
-  const wait = useRef<number | null>(null);
+  const { activeId, openSection, view } = usePortfolioView();
+  const drag = useRef(false);
+  const pendingRef = useRef<number | null>(null);
+  const viewRef = useRef(view);
+  const [phase, setPhase] = useState<"drag" | "rest">("rest");
+  const [pointer, setPointer] = useState({ x: 0, y: 0 });
+  const [pending, setPending] = useState<number | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  const [hovered, setHovered] = useState<number | null>(null);
+  const settled = settledIndex(activeId);
 
-  function clearWait() {
-    if (wait.current == null) {
+  useEffect(() => {
+    setHovered(null);
+  }, [activeId]);
+
+  useEffect(() => {
+    const returned = viewRef.current === "detail" && view === "focus";
+    viewRef.current = view;
+    if (!returned) {
       return;
     }
-    window.clearTimeout(wait.current);
-    wait.current = null;
-  }
+    drag.current = false;
+    pendingRef.current = null;
+    setPhase("rest");
+    setPending(null);
+    setAttempt(0);
+  }, [view]);
 
-  function releaseAim() {
-    clearWait();
-    choice.current = null;
-    setActive(null);
-  }
-
-  function cancel() {
-    releaseAim();
-    setPull({ x: 0, y: 0 });
-  }
-
-  function arm(index: number) {
-    setActive(index);
-    if (choice.current === index) {
+  useEffect(() => {
+    if (attempt === 0 || pending == null) {
       return;
     }
-    clearWait();
-    choice.current = index;
-    const id = navigation[index].href.slice(1);
-    wait.current = window.setTimeout(() => {
-      wait.current = null;
-      openSection(id);
-    }, commitDelay);
-  }
+    const index = pending;
+    const ticket = attempt;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const id = window.setTimeout(() => {
+      openSection(navigation[index].href.slice(1));
+      setPending(null);
+      setAttempt((current) => (current === ticket ? 0 : current));
+    }, reduce ? 0 : commitMs);
+    return () => window.clearTimeout(id);
+  }, [attempt, pending, openSection]);
 
-  useEffect(() => clearWait, []);
-
-  function readPoint(event: React.PointerEvent<HTMLDivElement>) {
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - (bounds.left + bounds.width / 2)) / bounds.width;
-    const y = (event.clientY - (bounds.top + bounds.height / 2)) / bounds.width;
-    const reach = 0.16;
-    const distance = Math.hypot(x, y);
-    const scale = distance > reach ? reach / distance : 1;
-    return {
-      x: x * scale,
-      y: y * scale,
-      index: sectorIndex(x, y, 0.24),
-    };
-  }
-
-  function follow(point: { x: number; y: number; index: number | null }) {
-    setPull({ x: point.x, y: point.y });
-    if (point.index == null) {
-      releaseAim();
+  function stage(index: number | null, force = false) {
+    if (!force && pendingRef.current === index) {
       return;
     }
-    arm(point.index);
+    pendingRef.current = index;
+    setPending(index);
+    setAttempt((ticket) => (index == null ? 0 : ticket + 1));
+  }
+
+  function follow(event: React.PointerEvent<HTMLDivElement>) {
+    const vector = readVector(event);
+    setPointer(clampReach(vector.x, vector.y));
+    stage(sectorOf(vector.x, vector.y));
   }
 
   function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
-    drag.current = event.pointerId;
-    try {
-      event.currentTarget.setPointerCapture(event.pointerId);
-    } catch {}
-    follow(readPoint(event));
+    const target = event.target;
+    if (event.button !== 0 || (target instanceof Element && target.closest("button"))) {
+      return;
+    }
+    drag.current = true;
+    setPhase("drag");
+    event.currentTarget.setPointerCapture(event.pointerId);
+    follow(event);
   }
 
   function onPointerMove(event: React.PointerEvent<HTMLDivElement>) {
-    if (drag.current !== event.pointerId) {
+    if (!drag.current) {
       return;
     }
-    follow(readPoint(event));
+    follow(event);
   }
 
-  function finish(event: React.PointerEvent<HTMLDivElement>) {
-    if (drag.current !== event.pointerId) {
+  function onPointerUp() {
+    if (!drag.current) {
       return;
     }
-    drag.current = -1;
-    const point = readPoint(event);
-    if (point.index == null) {
-      cancel();
-      return;
-    }
-    setPull({ x: 0, y: 0 });
-    arm(point.index);
+    drag.current = false;
+    setPhase("rest");
   }
 
-  const angle = active == null ? Math.atan2(pull.y, pull.x) : angleOf(active);
+  function choose(index: number) {
+    drag.current = false;
+    setPhase("rest");
+    stage(index, true);
+  }
+
   const knob =
-    active == null
-      ? { x: pull.x * 100, y: pull.y * 100 }
-      : { x: Math.cos(angle) * knobTravel, y: Math.sin(angle) * knobTravel };
-  const destination =
-    active == null
-      ? knob
-      : { x: Math.cos(angle) * orbit, y: Math.sin(angle) * orbit };
-  const span = Math.hypot(destination.x - knob.x, destination.y - knob.y);
-  const unitX = span === 0 ? Math.cos(angle) : (destination.x - knob.x) / span;
-  const unitY = span === 0 ? Math.sin(angle) : (destination.y - knob.y) / span;
-  const lineStart = knobRadius + 1.2;
-  const lineEnd = active == null ? lineStart + 8 : span;
-  const moving = Math.hypot(knob.x, knob.y) > 1 || active != null;
+    phase === "drag"
+      ? pointer
+      : pending != null
+        ? at(pending)
+        : settled != null
+          ? at(settled)
+          : { x: 0, y: 0 };
+  const marked = pending ?? settled;
+  const shown = pending ?? hovered ?? settled;
 
   return (
     <div className="w-full">
       <div
+        role="group"
+        aria-label="Seções"
         className="relative aspect-square w-full touch-none"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
-        onPointerUp={finish}
-        onPointerCancel={finish}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
       >
         <svg
           className="pointer-events-none absolute inset-0 h-full w-full"
           viewBox="0 0 100 100"
           aria-hidden="true"
         >
-          <circle cx="50" cy="50" r={orbit} fill="none" stroke="var(--line)" strokeWidth="0.45" />
-          {navigation.map((item, index) => {
-            const dotAngle = angleOf(index);
-            return (
-              <circle
-                key={item.href}
-                cx={50 + Math.cos(dotAngle) * orbit}
-                cy={50 + Math.sin(dotAngle) * orbit}
-                r={active === index ? 1.35 : 0.75}
-                fill={active === index ? "var(--accent)" : "var(--foreground)"}
-                opacity={active === index ? 1 : 0.7}
-              />
-            );
-          })}
-          {moving ? (
-            <line
-              x1={50 + knob.x + unitX * lineStart}
-              y1={50 + knob.y + unitY * lineStart}
-              x2={50 + knob.x + unitX * lineEnd}
-              y2={50 + knob.y + unitY * lineEnd}
+          <circle cx={center} cy={center} r={orbit} fill="none" stroke="var(--line)" strokeWidth="0.45" />
+          {pending != null ? (
+            <circle
+              key={attempt}
+              className="dial-commit"
+              cx={center}
+              cy={center}
+              r={orbit}
+              fill="none"
               stroke="var(--accent)"
-              strokeWidth="0.6"
-              strokeLinecap="round"
+              strokeWidth="1.6"
+              pathLength={100}
+              style={{ animationDuration: `${commitMs}ms` }}
             />
           ) : null}
         </svg>
+        {navigation.map((item, index) => {
+          const angle = angleOf(index);
+          const on = marked === index;
+          return (
+            <button
+              key={item.href}
+              type="button"
+              aria-label={item.label}
+              aria-pressed={on}
+              className="absolute grid size-8 -translate-x-1/2 -translate-y-1/2 cursor-pointer place-items-center rounded-full"
+              style={{
+                left: `${center + Math.cos(angle) * orbit}%`,
+                top: `${center + Math.sin(angle) * orbit}%`,
+              }}
+              onClick={() => choose(index)}
+              onMouseEnter={() => setHovered(index)}
+              onMouseLeave={() => setHovered((current) => (current === index ? null : current))}
+              onFocus={() => setHovered(index)}
+              onBlur={() => setHovered((current) => (current === index ? null : current))}
+            >
+              <span
+                className={`size-1.5 rounded-full transition-transform duration-200 motion-reduce:transition-none ${
+                  on ? "scale-150 bg-accent" : "bg-foreground/80"
+                }`}
+              />
+            </button>
+          );
+        })}
         <span
-          className="pointer-events-none absolute size-[20%] rounded-full bg-accent"
+          aria-hidden="true"
+          className={`pointer-events-none absolute size-[18%] rounded-full bg-accent ${
+            phase === "drag"
+              ? ""
+              : "transition-[left,top] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
+          }`}
           style={{
-            left: `${50 + knob.x}%`,
-            top: `${50 + knob.y}%`,
+            left: `${center + knob.x}%`,
+            top: `${center + knob.y}%`,
             transform: "translate(-50%, -50%)",
-            boxShadow: "0 0 0 12% color-mix(in srgb, var(--accent) 22%, transparent)",
+            boxShadow: "0 0 0 0.7rem color-mix(in srgb, var(--accent) 22%, transparent)",
           }}
         />
       </div>
-      <p className="mt-[0.65em] min-h-[1.2em] text-center font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
-        {active == null ? "\u00a0" : navigation[active].label}
+      <p
+        aria-live="polite"
+        className="mt-[0.65em] min-h-[1.2em] text-center font-mono text-[10px] uppercase tracking-[0.16em] text-accent"
+      >
+        {shown == null ? "Seções" : navigation[shown].label}
       </p>
     </div>
   );

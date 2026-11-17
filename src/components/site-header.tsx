@@ -22,7 +22,7 @@ type SiteHeaderProps = {
 export function SiteHeader({ brand, homeHref, items, labels }: SiteHeaderProps) {
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState("");
-  const { view, showDetail, showFocus } = usePortfolioView();
+  const { view, showDetail, showFocus, openSection } = usePortfolioView();
   const detailed = view === "detail";
 
   useEffect(() => {
@@ -96,7 +96,7 @@ export function SiteHeader({ brand, homeHref, items, labels }: SiteHeaderProps) 
                     onClick={(event) => {
                       event.preventDefault();
                       setOpen(false);
-                      scrollWithoutHash(item.href);
+                      openSection(item.href.slice(1));
                     }}
                   >
                     {item.label}

@@ -1,11 +1,12 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 type ViewName = "focus" | "detail";
 
 type PortfolioViewValue = {
   view: ViewName;
+  activeId: string | null;
   showDetail: () => void;
   showFocus: () => void;
   openSection: (id: string) => void;
@@ -15,6 +16,7 @@ const PortfolioViewContext = createContext<PortfolioViewValue | null>(null);
 
 export function PortfolioView({ children }: { children: React.ReactNode }) {
   const [view, setView] = useState<ViewName>("focus");
+  const [activeId, setActiveId] = useState<string | null>(null);
   const [target, setTarget] = useState<string | null>(null);
 
   useEffect(() => {
@@ -33,16 +35,18 @@ export function PortfolioView({ children }: { children: React.ReactNode }) {
 
   function showFocus() {
     setView("focus");
+    setActiveId(null);
     window.scrollTo({ top: 0 });
   }
 
-  function openSection(id: string) {
+  const openSection = useCallback((id: string) => {
     setView("detail");
+    setActiveId(id);
     setTarget(id);
-  }
+  }, []);
 
   return (
-    <PortfolioViewContext.Provider value={{ view, showDetail, showFocus, openSection }}>
+    <PortfolioViewContext.Provider value={{ view, activeId, showDetail, showFocus, openSection }}>
       {children}
     </PortfolioViewContext.Provider>
   );
