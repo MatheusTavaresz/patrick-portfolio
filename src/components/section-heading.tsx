@@ -1,7 +1,7 @@
 type SectionHeadingProps = {
   index: string;
   title: string;
-  lede: string;
+  lede?: string;
 };
 
 export function SectionHeading({ index, title, lede }: SectionHeadingProps) {
@@ -13,7 +13,9 @@ export function SectionHeading({ index, title, lede }: SectionHeadingProps) {
       <h2 className="mt-3 font-serif text-4xl tracking-tight text-balance md:text-5xl">
         {title}
       </h2>
-      <p className="mt-4 text-lg leading-relaxed text-muted">{lede}</p>
+      {lede ? (
+        <p className="mt-4 text-lg leading-relaxed text-muted">{lede}</p>
+      ) : null}
     </div>
   );
 }

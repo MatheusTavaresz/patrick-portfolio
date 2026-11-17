@@ -10,10 +10,12 @@ declare module "vanta/dist/vanta.globe.min" {
     scale?: number;
     scaleMobile?: number;
     color?: number;
+    color2?: number;
     backgroundColor?: number;
   };
 
   export default function createGlobe(options: VantaGlobeOptions): {
     destroy: () => void;
+    setOptions: (options: Partial<VantaGlobeOptions>) => void;
   };
 }

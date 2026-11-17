@@ -1,0 +1,246 @@
+{
+  "profile": {
+    "name": "Matheus Patrick Tavares",
+    "brand": "Matheus Patrick",
+    "role": "Engenharia de Software",
+    "discipline": "Engenharia de Software · Full Stack",
+    "location": "Florianópolis, SC — Brasil",
+    "linkedin": "https://www.linkedin.com/in/matheus-patrickz/",
+    "linkedinLabel": "linkedin.com/in/matheus-patrickz",
+    "github": "https://github.com/MatheusTavaresz",
+    "githubLabel": "github.com/MatheusTavaresz",
+    "nameLines": [
+      "Matheus",
+      "Patrick",
+      "Tavares"
+    ]
+  },
+  "chrome": {
+    "lang": "pt-BR",
+    "locale": "pt_BR",
+    "mainId": "conteudo",
+    "skipLabel": "Ir para o conteúdo",
+    "menu": "Menu",
+    "close": "Fechar",
+    "themeToLight": "Claro",
+    "themeToDark": "Escuro"
+  },
+  "sections": [
+    {
+      "kind": "hero",
+      "id": "topo"
+    },
+    {
+      "kind": "projects",
+      "id": "projetos",
+      "index": "01",
+      "nav": "Projetos",
+      "title": "Projetos relevantes",
+      "labels": {
+        "context": "Contexto",
+        "solution": "Solução",
+        "result": "Resultado"
+      },
+      "items": [
+        {
+          "id": "boletos",
+          "index": "01",
+          "title": "Engine de extração de boletos e faturas",
+          "context": "A operação pagava licença tarifada por página processada em software externo e dependia de conferência manual lenta para alimentar o ERP.",
+          "solution": "Implementação de um motor interno que prioriza a extração direta dos vetores de texto do PDF estruturado, validando linha digitável, código de barras e datas pelas diretrizes formais da FEBRABAN. Desenvolvi um pipeline de fallback em OCR via Tesseract.js estritamente para arquivos rasterizados ou fotos de baixa resolução.",
+          "result": "Eliminação do custo por uso externo, previsibilidade de infraestrutura e queda do tempo médio de inserção de dados de 60s para menos de 20s.",
+          "tools": [
+            "PHP",
+            "Parser PDF",
+            "Validação FEBRABAN",
+            "Tesseract.js"
+          ]
+        },
+        {
+          "id": "serasa",
+          "index": "02",
+          "title": "Automação de cobrança e conexão com Serasa Experian",
+          "context": "A gestão de inadimplência exigia envio em lote onde a obtenção dos dados era um processo manual, baseado com base no relatorio de conciliação dos convênios.",
+          "solution": "Desenvolvimento da rotina automatizada de geração dos arquivos de remessa posicional conforme as especificações do Serasa, acompanhada pelo transporte via SFTP e pelo processamento assíncrono dos arquivos de retorno.",
+          "result": "Ciclo de cobrança integrado ao sistema, sem intervenção humana na montagem de lotes ou na leitura de retorno.",
+          "tools": [
+            "SFTP",
+            "Arquivo posicional",
+            "Reconciliação"
+          ]
+        },
+        {
+          "id": "baas",
+          "index": "03",
+          "title": "Expansão da integração de BaaS",
+          "context": "A oferta de Banking as a Service precisava ampliar a própria integração da plataforma para atender o setor financeiro.",
+          "solution": "Expansão do BaaS e evolução de uma tela que foi usada para pagamento de propostas usando NextJS.",
+          "result": "A expansão deu ao setor financeiro autonomia e agilidade de fazer o pagamento de propostas com apenas um clique",
+          "tools": [
+            "NestJS",
+            "ReactJS",
+            "BaaS"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "repositories",
+      "id": "repositorios",
+      "index": "02",
+      "nav": "Repositórios",
+      "title": "Projetos pessoais",
+      "lede": "Repositórios públicos no GitHub.",
+      "items": [
+        {
+          "id": "magnar-scrapping",
+          "title": "magnar-scrapping",
+          "description": "Scraper em TypeScript para documentos de Análisis Jurisprudencial do Poder Judicial del Perú. Percorre a listagem, baixa PDFs e retoma a execução por checkpoint de progresso e falhas.",
+          "url": "https://github.com/MatheusTavaresz/magnar-scrapping",
+          "stack": ["TypeScript", "Node.js"]
+        },
+        {
+          "id": "go-ticket-reader",
+          "title": "go-ticket-reader",
+          "description": "CLI em Go que lê a camada de texto de um PDF de boleto e imprime a linha digitável de 47 dígitos, validando módulo 10 e módulo 11. Não usa OCR.",
+          "url": "https://github.com/MatheusTavaresz/go-ticket-reader",
+          "stack": ["Go"]
+        },
+        {
+          "id": "file-maker",
+          "title": "file-maker",
+          "description": "Aplicação para gerar arquivos de layout posicional usados em sistemas legados, bancos e birôs. O backend em NestJS descreve o layout e o frontend em React monta o formulário, o preview e o download.",
+          "url": "https://github.com/MatheusTavaresz/file-maker",
+          "stack": ["NestJS", "React", "TypeScript"]
+        },
+        {
+          "id": "git-user-fetch",
+          "title": "git-user-fetch",
+          "description": "Aplicação Next.js e NestJS para buscar perfil e repositórios no GitHub. Producer e consumer se comunicam por RabbitMQ e os dados ficam no MariaDB.",
+          "url": "https://github.com/MatheusTavaresz/git-user-fetch",
+          "stack": ["Next.js", "NestJS", "RabbitMQ", "MariaDB"]
+        }
+      ]
+    },
+    {
+      "kind": "experience",
+      "id": "trajetoria",
+      "index": "03",
+      "nav": "Trajetória",
+      "title": "Trajetória profissional",
+      "items": [
+        {
+          "id": "neo-credito",
+          "company": "Neo Crédito",
+          "title": "Desenvolvedor Full Stack Pleno",
+          "period": "Julho de 2024 — presente",
+          "points": [
+            "Sustentação e modernização de sistemas legados em PHP, introduzindo novos fluxos e garantindo que o sistema opere nos conformes.",
+            "Desenvolvi em NestJS utilizando boas praticas de desenvolvimento como principios de SOLID e clean code, criando e extendendo novas funcionalidades.",
+            "Atuação em Code Review, testes de demanda e especificação tecnica, dando suporte ao time nas atividades do quadro do Jira.",
+            "Uso de Docker no dia a dia.",
+            "Documentação em Markdown para contexto de LLMs e compartilhamento de fluxo para demais pessoas do time."
+          ]
+        },
+        {
+          "id": "ezok",
+          "company": "Ezok",
+          "title": "Desenvolvedor Full Stack (Contrato / Squad de Engenharia)",
+          "period": "Agosto de 2023 — dezembro de 2023",
+          "points": [
+            "Desenvolvi APIs em NestJS com PostgreSQL, priorizando arquitetura modular, tipagem estrita e manutenibilidade a longo prazo.",
+            "Construí interfaces web com Vue.js e Nuxt.js, integrando requisições assíncronas com tratamento de erros.",
+            "Modelei e implantei rotinas de web scraping com tratamento de proxies e parsing de payloads para mineração de dados sem API pública."
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "skills",
+      "id": "tecnologias",
+      "index": "04",
+      "nav": "Tecnologias",
+      "title": "Tecnologias e competências",
+      "columns": [
+        "Área",
+        "Tecnologias e ferramentas"
+      ],
+      "groups": [
+        {
+          "area": "Backend & Core",
+          "tools": "TypeScript, Node.js, NestJS, Go, PHP, REST, arquitetura limpa"
+        },
+        {
+          "area": "Automação & IA",
+          "tools": "Python, automações com IA, workflows n8n"
+        },
+        {
+          "area": "Banco de dados",
+          "tools": "PostgreSQL, MariaDB, MySQL, TypeORM, Prisma, modelagem relacional"
+        },
+        {
+          "area": "Frontend",
+          "tools": "Next.js, React, Vue.js, Nuxt.js, TypeScript, Tailwind CSS"
+        },
+        {
+          "area": "DevOps & integrações",
+          "tools": "Docker, SFTP, GitLab CI/CD, AWS, Cloudflare, Linux"
+        },
+        {
+          "area": "Engenharia & práticas",
+          "tools": "SOLID, Clean Code, code review, arquivos posicionais bancários, OCR"
+        }
+      ]
+    },
+    {
+      "kind": "background",
+      "id": "formacao",
+      "index": "05",
+      "nav": "Formação",
+      "title": "Formação e aprendizado contínuo",
+      "studiesTitle": "Especializações e cursos",
+      "education": [
+        {
+          "place": "Análise e Desenvolvimento de Sistemas",
+          "detail": "UniAmérica · em andamento, 2025–2028"
+        },
+        {
+          "place": "Formação Web Full Stack",
+          "detail": "OneBitCode · 2021–2022"
+        }
+      ],
+      "studies": [
+        {
+          "place": "Backend & arquitetura",
+          "detail": "NestJS corporativo com TypeORM, Prisma e Swagger. Go e concorrência. Clean Code em TypeScript."
+        },
+        {
+          "place": "Eventos e tendências",
+          "detail": "TDC Floripa · arquiteturas de IA e LLMs em sistemas corporativos."
+        }
+      ]
+    },
+    {
+      "kind": "contact",
+      "id": "conexao",
+      "index": "06",
+      "nav": "Conexão",
+      "title": "Conexão",
+      "lede": "Para conversar sobre arquitetura backend, esteiras financeiras, modernização de legados ou novas oportunidades de engenharia.",
+      "channels": [
+        {
+          "label": "LinkedIn",
+          "source": "linkedin"
+        },
+        {
+          "label": "GitHub",
+          "source": "github"
+        },
+        {
+          "label": "Localização",
+          "source": "location"
+        }
+      ]
+    }
+  ]
+}

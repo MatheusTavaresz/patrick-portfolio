@@ -1,13 +1,26 @@
 @import "tailwindcss";
 
-:root {
-  --background: #efeae1;
-  --foreground: #1c1b17;
-  --muted: #3f3c37;
-  --line: #d5cfc3;
-  --accent: #0c6b52;
-  --surface: #e6e0d4;
-  --on-accent: #f4f1ea;
+:root,
+[data-theme="dark"] {
+  --background: #140f0c;
+  --foreground: #f6efe4;
+  --muted: #c4ad96;
+  --line: #3d3126;
+  --accent: #e39a45;
+  --surface: #1e1712;
+  --on-accent: #1a120c;
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --background: #f4eadc;
+  --foreground: #1c140e;
+  --muted: #6e5844;
+  --line: #e2d3c0;
+  --accent: #a85d1c;
+  --surface: #efe2d2;
+  --on-accent: #f8f3ea;
+  color-scheme: light;
 }
 
 @theme inline {
@@ -21,6 +34,32 @@
   --font-sans: var(--font-instrument-sans);
   --font-serif: var(--font-instrument-serif);
   --font-mono: var(--font-ibm-plex-mono);
+}
+
+.theme-to-light,
+.theme-to-dark {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transform: rotate(-50deg) scale(0.6);
+  transition:
+    opacity 480ms ease,
+    transform 480ms ease;
+}
+
+[data-theme="dark"] .theme-to-light,
+[data-theme="light"] .theme-to-dark {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-to-light,
+  .theme-to-dark {
+    transition: none;
+  }
 }
 
 body {

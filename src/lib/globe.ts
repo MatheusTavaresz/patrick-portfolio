@@ -1,8 +1,11 @@
-type GlobeEffect = {
+import { readGlobeColors } from "@/lib/theme";
+
+export type GlobeEffect = {
   destroy: () => void;
+  setOptions: (options: ReturnType<typeof readGlobeColors>) => void;
 };
 
-export const globeSettings = {
+export const globeBehavior = {
   mouseControls: true,
   touchControls: true,
   gyroControls: false,
@@ -10,8 +13,6 @@ export const globeSettings = {
   minWidth: 200,
   scale: 1,
   scaleMobile: 1,
-  color: 0x24a482,
-  backgroundColor: 0x0,
 } as const;
 
 export async function mountGlobe(element: HTMLElement): Promise<GlobeEffect> {
@@ -21,6 +22,7 @@ export async function mountGlobe(element: HTMLElement): Promise<GlobeEffect> {
   return createGlobe({
     el: element,
     THREE,
-    ...globeSettings,
+    ...globeBehavior,
+    ...readGlobeColors(),
   });
 }

@@ -1,18 +1,23 @@
 import { Container } from "@/components/container";
 import { SectionHeading } from "@/components/section-heading";
-import { cases } from "@/lib/profile";
+import type { ProjectsSection } from "@/lib/profile";
 
-export function Cases() {
+type CasesProps = {
+  section: ProjectsSection;
+};
+
+export function Cases({ section }: CasesProps) {
+  const narrative = [
+    { key: "context", label: section.labels.context },
+    { key: "solution", label: section.labels.solution },
+  ] as const;
+
   return (
-    <section id="trabalho">
+    <section id={section.id}>
       <Container className="py-20 md:py-28">
-        <SectionHeading
-          index="01"
-          title="Trabalho"
-          lede="Três entregas em que o sistema assumiu trabalho manual, arquivo solto ou serviço cobrado por uso."
-        />
+        <SectionHeading index={section.index} title={section.title} />
         <div className="mt-14 border-b border-line">
-          {cases.map((item) => (
+          {section.items.map((item) => (
             <article
               key={item.id}
               className="grid gap-6 border-t border-line py-10 md:grid-cols-12 md:gap-10 md:py-14"
@@ -29,11 +34,19 @@ export function Cases() {
                 <h3 className="font-serif text-3xl tracking-tight text-balance md:text-4xl">
                   {item.title}
                 </h3>
-                <p className="mt-4 text-lg leading-relaxed">{item.problem}</p>
-                <p className="mt-3 leading-relaxed text-muted">{item.approach}</p>
+                {narrative.map((block) => (
+                  <div key={block.key} className="mt-6">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-accent">
+                      {block.label}
+                    </p>
+                    <p className="mt-2 leading-relaxed text-muted">
+                      {item[block.key]}
+                    </p>
+                  </div>
+                ))}
                 <div className="mt-6 border-l-2 border-accent pl-4">
                   <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-accent">
-                    Resultado
+                    {section.labels.result}
                   </p>
                   <p className="mt-2 leading-relaxed">{item.result}</p>
                 </div>
