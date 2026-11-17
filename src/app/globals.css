@@ -202,28 +202,9 @@ section[id] {
   }
 }
 
-@keyframes dial-commit {
-  from {
-    stroke-dashoffset: 100;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-.dial-commit {
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  animation-name: dial-commit;
-  animation-duration: 1s;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .fx-annotate path,
-  .fx-annotate .fx-annotate-line,
-  .dial-commit {
+  .fx-annotate .fx-annotate-line {
     animation: none;
     stroke-dashoffset: 0;
     opacity: 1;

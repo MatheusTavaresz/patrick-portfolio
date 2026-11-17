@@ -1,242 +1,187 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { usePortfolioView } from "@/components/portfolio-view";
 import { navigation } from "@/lib/profile";
 
-const center = 50;
-const orbit = 32;
-const reach = 22;
-const dead = 11;
-const commitMs = 1000;
+const buttonSize = 2.75;
+const fanGap = 1.05;
+const arcStart = (160 * Math.PI) / 180;
+const arcEnd = (20 * Math.PI) / 180;
 
-function angleOf(index: number) {
-  return -Math.PI / 2 + (index * Math.PI * 2) / navigation.length;
-}
-
-function sectorOf(x: number, y: number) {
-  if (Math.hypot(x, y) < dead) {
-    return null;
-  }
-  const step = (Math.PI * 2) / navigation.length;
-  const turned = Math.atan2(y, x) + Math.PI / 2;
-  const normalized = (turned + Math.PI * 2) % (Math.PI * 2);
-  return Math.round(normalized / step) % navigation.length;
-}
-
-function clampReach(x: number, y: number) {
-  const distance = Math.hypot(x, y);
-  if (distance <= reach) {
-    return { x, y };
-  }
-  const scale = reach / distance;
-  return { x: x * scale, y: y * scale };
-}
-
-function at(index: number) {
-  const angle = angleOf(index);
-  return { x: Math.cos(angle) * reach, y: Math.sin(angle) * reach };
-}
-
-function settledIndex(activeId: string | null) {
-  if (activeId == null) {
-    return null;
-  }
-  const index = navigation.findIndex((item) => item.href.slice(1) === activeId);
-  return index < 0 ? null : index;
-}
-
-function readVector(event: React.PointerEvent<HTMLDivElement>) {
-  const bounds = event.currentTarget.getBoundingClientRect();
+function fanOffset(index: number, count: number) {
+  const steps = Math.max(count - 1, 1);
+  const step = (arcStart - arcEnd) / steps;
+  const radius = (buttonSize + fanGap) / (2 * Math.sin(step / 2));
+  const angle = arcStart - step * index;
   return {
-    x: ((event.clientX - bounds.left) / bounds.width) * 100 - center,
-    y: ((event.clientY - bounds.top) / bounds.height) * 100 - center,
+    x: Math.cos(angle) * radius,
+    y: -Math.sin(angle) * radius,
   };
 }
 
+function labelPlace(offset: { x: number; y: number }) {
+  if (Math.abs(offset.x) < Math.abs(offset.y) * 0.45) {
+    return "bottom-[calc(100%+0.45rem)] left-1/2 -translate-x-1/2";
+  }
+  if (offset.x < 0) {
+    return "bottom-[calc(100%+0.45rem)] right-1/2";
+  }
+  return "bottom-[calc(100%+0.45rem)] left-1/2";
+}
+
+const sectionIcons: Record<string, () => React.JSX.Element> = {
+  projetos: ProjectsIcon,
+  repositorios: GitIcon,
+  trajetoria: BriefcaseIcon,
+  tecnologias: CodeIcon,
+  formacao: CapIcon,
+  conexao: MailIcon,
+};
+
 export function SectionDial() {
-  const { activeId, openSection, view } = usePortfolioView();
-  const drag = useRef(false);
-  const pendingRef = useRef<number | null>(null);
-  const viewRef = useRef(view);
-  const [phase, setPhase] = useState<"drag" | "rest">("rest");
-  const [pointer, setPointer] = useState({ x: 0, y: 0 });
-  const [pending, setPending] = useState<number | null>(null);
-  const [attempt, setAttempt] = useState(0);
-  const [hovered, setHovered] = useState<number | null>(null);
-  const settled = settledIndex(activeId);
+  const { activeId, openSection } = usePortfolioView();
+  const toggleRef = useRef<HTMLInputElement>(null);
+  const origin = "left-1/2 top-[calc(100%-2.1rem)]";
 
-  useEffect(() => {
-    setHovered(null);
-  }, [activeId]);
-
-  useEffect(() => {
-    const returned = viewRef.current === "detail" && view === "focus";
-    viewRef.current = view;
-    if (!returned) {
-      return;
+  function choose(id: string) {
+    if (toggleRef.current) {
+      toggleRef.current.checked = false;
     }
-    drag.current = false;
-    pendingRef.current = null;
-    setPhase("rest");
-    setPending(null);
-    setAttempt(0);
-  }, [view]);
-
-  useEffect(() => {
-    if (attempt === 0 || pending == null) {
-      return;
-    }
-    const index = pending;
-    const ticket = attempt;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const id = window.setTimeout(() => {
-      openSection(navigation[index].href.slice(1));
-      setPending(null);
-      setAttempt((current) => (current === ticket ? 0 : current));
-    }, reduce ? 0 : commitMs);
-    return () => window.clearTimeout(id);
-  }, [attempt, pending, openSection]);
-
-  function stage(index: number | null, force = false) {
-    if (!force && pendingRef.current === index) {
-      return;
-    }
-    pendingRef.current = index;
-    setPending(index);
-    setAttempt((ticket) => (index == null ? 0 : ticket + 1));
+    openSection(id);
   }
-
-  function follow(event: React.PointerEvent<HTMLDivElement>) {
-    const vector = readVector(event);
-    setPointer(clampReach(vector.x, vector.y));
-    stage(sectorOf(vector.x, vector.y));
-  }
-
-  function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
-    const target = event.target;
-    if (event.button !== 0 || (target instanceof Element && target.closest("button"))) {
-      return;
-    }
-    drag.current = true;
-    setPhase("drag");
-    event.currentTarget.setPointerCapture(event.pointerId);
-    follow(event);
-  }
-
-  function onPointerMove(event: React.PointerEvent<HTMLDivElement>) {
-    if (!drag.current) {
-      return;
-    }
-    follow(event);
-  }
-
-  function onPointerUp() {
-    if (!drag.current) {
-      return;
-    }
-    drag.current = false;
-    setPhase("rest");
-  }
-
-  function choose(index: number) {
-    drag.current = false;
-    setPhase("rest");
-    stage(index, true);
-  }
-
-  const knob =
-    phase === "drag"
-      ? pointer
-      : pending != null
-        ? at(pending)
-        : settled != null
-          ? at(settled)
-          : { x: 0, y: 0 };
-  const marked = pending ?? settled;
-  const shown = pending ?? hovered ?? settled;
 
   return (
-    <div className="w-full">
-      <div
-        role="group"
-        aria-label="Seções"
-        className="relative aspect-square w-full touch-none"
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
-      >
-        <svg
-          className="pointer-events-none absolute inset-0 h-full w-full"
-          viewBox="0 0 100 100"
-          aria-hidden="true"
-        >
-          <circle cx={center} cy={center} r={orbit} fill="none" stroke="var(--line)" strokeWidth="0.45" />
-          {pending != null ? (
-            <circle
-              key={attempt}
-              className="dial-commit"
-              cx={center}
-              cy={center}
-              r={orbit}
-              fill="none"
-              stroke="var(--accent)"
-              strokeWidth="1.6"
-              pathLength={100}
-              style={{ animationDuration: `${commitMs}ms` }}
-            />
-          ) : null}
-        </svg>
-        {navigation.map((item, index) => {
-          const angle = angleOf(index);
-          const on = marked === index;
-          return (
-            <button
-              key={item.href}
-              type="button"
-              aria-label={item.label}
-              aria-pressed={on}
-              className="absolute grid size-8 -translate-x-1/2 -translate-y-1/2 cursor-pointer place-items-center rounded-full"
-              style={{
-                left: `${center + Math.cos(angle) * orbit}%`,
-                top: `${center + Math.sin(angle) * orbit}%`,
-              }}
-              onClick={() => choose(index)}
-              onMouseEnter={() => setHovered(index)}
-              onMouseLeave={() => setHovered((current) => (current === index ? null : current))}
-              onFocus={() => setHovered(index)}
-              onBlur={() => setHovered((current) => (current === index ? null : current))}
+    <div className="relative h-56 w-full">
+      <input ref={toggleRef} id="section-fan" type="checkbox" className="peer sr-only" />
+      {navigation.map((item, index) => {
+        const id = item.href.slice(1);
+        const offset = fanOffset(index, navigation.length);
+        const Icon = sectionIcons[id] ?? ProjectsIcon;
+        const on = activeId === id;
+        return (
+          <button
+            key={item.href}
+            type="button"
+            aria-label={item.label}
+            aria-pressed={on}
+            style={
+              {
+                transitionDelay: `${index * 50}ms`,
+                "--fan-x": `${offset.x}rem`,
+                "--fan-y": `${offset.y}rem`,
+              } as React.CSSProperties
+            }
+            className={`${origin} group absolute z-10 grid size-11 place-items-center rounded-full border border-line bg-surface text-foreground opacity-0 pointer-events-none [transform:translate(-50%,-50%)_scale(0.4)] transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] peer-checked:pointer-events-auto peer-checked:opacity-100 peer-checked:[transform:translate(calc(-50%+var(--fan-x)),calc(-50%+var(--fan-y)))_scale(1)] hover:z-30 focus-visible:z-30 motion-reduce:transition-none ${
+              on ? "border-accent text-accent" : ""
+            }`}
+            onClick={() => choose(id)}
+          >
+            <span
+              className={`pointer-events-none absolute z-30 whitespace-nowrap rounded-full bg-background/90 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-accent opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 ${labelPlace(offset)}`}
             >
-              <span
-                className={`size-1.5 rounded-full transition-transform duration-200 motion-reduce:transition-none ${
-                  on ? "scale-150 bg-accent" : "bg-foreground/80"
-                }`}
-              />
-            </button>
-          );
-        })}
-        <span
-          aria-hidden="true"
-          className={`pointer-events-none absolute size-[18%] rounded-full bg-accent ${
-            phase === "drag"
-              ? ""
-              : "transition-[left,top] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
-          }`}
-          style={{
-            left: `${center + knob.x}%`,
-            top: `${center + knob.y}%`,
-            transform: "translate(-50%, -50%)",
-            boxShadow: "0 0 0 0.7rem color-mix(in srgb, var(--accent) 22%, transparent)",
-          }}
-        />
-      </div>
-      <p
-        aria-live="polite"
-        className="mt-[0.65em] min-h-[1.2em] text-center font-mono text-[10px] uppercase tracking-[0.16em] text-accent"
+              {item.label}
+            </span>
+            <Icon />
+          </button>
+        );
+      })}
+      <label
+        htmlFor="section-fan"
+        className={`${origin} absolute z-20 grid size-14 -translate-x-1/2 -translate-y-1/2 cursor-pointer place-items-center rounded-full bg-accent text-on-accent peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-accent peer-checked:[&_svg]:rotate-45`}
+        style={{ boxShadow: "0 0 1.5rem color-mix(in srgb, var(--accent) 42%, transparent)" }}
       >
-        {shown == null ? "Seções" : navigation[shown].label}
-      </p>
+        <span className="sr-only">Seções</span>
+        <PlusIcon />
+      </label>
     </div>
+  );
+}
+
+function PlusIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="size-6 transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    >
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+function iconFrame(children: React.ReactNode) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="size-5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {children}
+    </svg>
+  );
+}
+
+function ProjectsIcon() {
+  return iconFrame(
+    <>
+      <rect x="7" y="7" width="12" height="12" rx="1.6" />
+      <path d="M5 16.5V6.6A1.6 1.6 0 0 1 6.6 5H16" />
+    </>,
+  );
+}
+
+function GitIcon() {
+  return iconFrame(
+    <>
+      <circle cx="6.5" cy="6.5" r="2.1" />
+      <circle cx="6.5" cy="17.5" r="2.1" />
+      <circle cx="17.5" cy="12" r="2.1" />
+      <path d="M6.5 8.6v6.8M8.4 7.4c2.4.8 5.2 1.4 7 3.2" />
+    </>,
+  );
+}
+
+function BriefcaseIcon() {
+  return iconFrame(
+    <>
+      <rect x="3" y="8" width="18" height="11" rx="1.6" />
+      <path d="M9 8V6.6A1.6 1.6 0 0 1 10.6 5h2.8A1.6 1.6 0 0 1 15 6.6V8M3 13h18" />
+    </>,
+  );
+}
+
+function CodeIcon() {
+  return iconFrame(
+    <>
+      <path d="m9 8-4 4 4 4M15 8l4 4-4 4" />
+    </>,
+  );
+}
+
+function CapIcon() {
+  return iconFrame(
+    <>
+      <path d="m3 10 9-4 9 4-9 4-9-4Z" />
+      <path d="M7.5 12.2V16c0 .9 2 2.4 4.5 2.4s4.5-1.5 4.5-2.4v-3.8M21 10.2V16" />
+    </>,
+  );
+}
+
+function MailIcon() {
+  return iconFrame(
+    <>
+      <rect x="3" y="6" width="18" height="12" rx="1.6" />
+      <path d="m4 7 8 6 8-6" />
+    </>,
   );
 }

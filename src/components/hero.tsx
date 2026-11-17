@@ -43,7 +43,7 @@ export function Hero({ section, profile }: HeroProps) {
               ) : null}
             </WhenDetailed>
           </div>
-          <div className="mx-auto w-[min(62vw,13.5rem)] md:mx-0 md:w-[clamp(11rem,18vw,13.5rem)] md:justify-self-end">
+          <div className="mx-auto w-full max-w-[19rem] md:mx-0 md:w-[19rem] md:justify-self-end">
             <SectionDial />
           </div>
         </div>
