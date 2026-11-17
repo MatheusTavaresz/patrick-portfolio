@@ -100,7 +100,7 @@ export function SiteHeader({ brand, homeHref, items, labels }: SiteHeaderProps) 
           </nav>
           <button
             type="button"
-            className="relative grid size-9 place-items-center overflow-hidden border border-line text-muted transition-colors hover:border-foreground hover:text-foreground"
+            className="relative grid size-9 cursor-pointer place-items-center overflow-hidden border border-line text-muted transition-colors hover:border-foreground hover:text-foreground"
             onClick={() => {
               toggleTheme();
               setTheme(document.documentElement.dataset.theme ?? "");
