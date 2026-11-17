@@ -1,5 +1,8 @@
 import { Container } from "@/components/container";
 import { HeroMedia } from "@/components/hero-media";
+import { NameAnnotate } from "@/components/name-annotate";
+import { WhenDetailed } from "@/components/portfolio-view";
+import { SectionDial } from "@/components/section-dial";
 import type { HeroSection, Profile } from "@/lib/profile";
 
 type HeroProps = {
@@ -11,7 +14,7 @@ export function Hero({ section, profile }: HeroProps) {
   return (
     <section
       id={section.id}
-      className="relative isolate overflow-hidden border-b border-line bg-background"
+      className="relative isolate flex h-[calc(100svh-4.75rem)] items-center overflow-hidden border-b border-line bg-background"
     >
       <HeroMedia />
       <div
@@ -22,23 +25,32 @@ export function Hero({ section, profile }: HeroProps) {
         className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent"
         aria-hidden="true"
       />
-      <Container className="relative z-10 py-16 md:py-24">
-        <div className="flex items-start justify-between gap-4 font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
-          <p>{profile.discipline}</p>
-          <p className="shrink-0 text-right">{profile.location}</p>
+      <Container className="relative z-10 w-full">
+        <div className="grid w-full items-center gap-[clamp(1.25rem,4vw,3rem)] md:grid-cols-[minmax(0,1fr)_auto]">
+          <div className="text-enter min-w-0">
+            <div className="flex flex-col gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
+              <p>{profile.discipline}</p>
+              <p>{profile.location}</p>
+            </div>
+            <div className="mt-5">
+              <NameAnnotate lines={profile.nameLines} />
+              <p className="mt-4 font-mono text-sm uppercase tracking-[0.22em] text-accent">
+                {profile.focusRole}
+              </p>
+            </div>
+            <WhenDetailed>
+              {profile.lead ? (
+                <p className="mt-8 max-w-xl text-xl leading-relaxed md:text-2xl">{profile.lead}</p>
+              ) : null}
+              {profile.support ? (
+                <p className="mt-4 max-w-xl leading-relaxed text-muted">{profile.support}</p>
+              ) : null}
+            </WhenDetailed>
+          </div>
+          <div className="mx-auto w-[min(68vw,15rem)] md:mx-0 md:w-[clamp(11rem,18vw,15rem)] md:justify-self-end">
+            <SectionDial />
+          </div>
         </div>
-        <h1 className="mt-8 max-w-4xl font-serif text-[clamp(3.4rem,8vw,6.4rem)] leading-[0.88] tracking-[-0.035em]">
-          {profile.nameLines.map((line, index) => (
-            <span key={line}>
-              {index > 0 ? <br /> : null}
-              {line}
-            </span>
-          ))}
-        </h1>
-        <p className="mt-8 max-w-xl text-xl leading-relaxed md:text-2xl">
-          {profile.lead}
-        </p>
-        <p className="mt-4 max-w-xl leading-relaxed text-muted">{profile.support}</p>
       </Container>
     </section>
   );

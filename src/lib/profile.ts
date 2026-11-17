@@ -5,6 +5,7 @@ export type Profile = {
   brand: string;
   role: string;
   discipline: string;
+  focusRole: string;
   location: string;
   linkedin: string;
   linkedinLabel: string;
@@ -24,6 +25,8 @@ export type Chrome = {
   close: string;
   themeToLight: string;
   themeToDark: string;
+  detail: string;
+  focus: string;
 };
 
 export type CaseStudy = {

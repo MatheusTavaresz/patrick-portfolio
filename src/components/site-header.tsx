@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Container } from "@/components/container";
+import { usePortfolioView } from "@/components/portfolio-view";
 import { followSystemTheme, toggleTheme } from "@/lib/theme";
 
 type SiteHeaderProps = {
@@ -13,12 +14,16 @@ type SiteHeaderProps = {
     close: string;
     themeToLight: string;
     themeToDark: string;
+    detail: string;
+    focus: string;
   };
 };
 
 export function SiteHeader({ brand, homeHref, items, labels }: SiteHeaderProps) {
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState("");
+  const { view, showDetail, showFocus } = usePortfolioView();
+  const detailed = view === "detail";
 
   useEffect(() => {
     setTheme(document.documentElement.dataset.theme ?? "dark");
@@ -75,9 +80,11 @@ export function SiteHeader({ brand, homeHref, items, labels }: SiteHeaderProps) 
           <nav
             id="site-menu"
             className={
-              open
-                ? "absolute inset-x-0 top-full border-b border-line bg-background px-5 py-5 md:static md:inset-auto md:border-0 md:bg-transparent md:p-0"
-                : "hidden md:block"
+              !detailed
+                ? "hidden"
+                : open
+                  ? "absolute inset-x-0 top-full border-b border-line bg-background px-5 py-5 md:static md:inset-auto md:border-0 md:bg-transparent md:p-0"
+                  : "hidden md:block"
             }
           >
             <ul className="flex flex-col gap-4 md:flex-row md:items-center md:gap-7">
@@ -100,6 +107,13 @@ export function SiteHeader({ brand, homeHref, items, labels }: SiteHeaderProps) 
           </nav>
           <button
             type="button"
+            className="cursor-pointer font-mono text-[11px] uppercase tracking-[0.16em] text-muted transition-colors hover:text-foreground"
+            onClick={detailed ? showFocus : showDetail}
+          >
+            {detailed ? labels.focus : labels.detail}
+          </button>
+          <button
+            type="button"
             className="relative grid size-9 cursor-pointer place-items-center overflow-hidden border border-line text-muted transition-colors hover:border-foreground hover:text-foreground"
             onClick={() => {
               toggleTheme();
@@ -117,7 +131,7 @@ export function SiteHeader({ brand, homeHref, items, labels }: SiteHeaderProps) 
           </button>
           <button
             type="button"
-            className="font-mono text-[11px] uppercase tracking-[0.16em] md:hidden"
+            className={`font-mono text-[11px] uppercase tracking-[0.16em] md:hidden ${detailed ? "" : "hidden"}`}
             aria-expanded={open}
             aria-controls="site-menu"
             onClick={() => setOpen((current) => !current)}

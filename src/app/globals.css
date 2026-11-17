@@ -82,8 +82,131 @@ section[id] {
   scroll-margin-top: 5.5rem;
 }
 
+@keyframes text-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.7em);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes block-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
+  }
+
+  .text-enter :is(h1, p) {
+    animation: text-rise 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .text-enter h1 {
+    animation-delay: 0.12s;
+  }
+
+  .text-enter > p {
+    animation-delay: 0.28s;
+  }
+
+  .text-enter > p + p {
+    animation-delay: 0.42s;
+  }
+
+  [data-reveal] {
+    animation: block-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 40%;
+  }
+
+  [data-reveal] :is(h2, h3, p, a) {
+    animation: text-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-timeline: view();
+    animation-range: entry 8% entry 48%;
+  }
+}
+
+.fx-annotate {
+  position: relative;
+  display: inline-block;
+  padding: 0.18em 0.42em 0.28em;
+  color: var(--foreground);
+}
+
+.fx-annotate svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  transform: rotate(-1.2deg);
+}
+
+.fx-annotate path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: fx-annotate-draw 1.5s cubic-bezier(0.45, 0, 0.2, 1) both;
+}
+
+.fx-annotate .fx-annotate-line {
+  stroke: color-mix(in srgb, var(--accent) 72%, var(--foreground));
+  stroke-width: 3;
+  animation-name: fx-annotate-draw-line;
+}
+
+@keyframes fx-annotate-draw {
+  0% {
+    stroke-dashoffset: 100;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes fx-annotate-draw-line {
+  0%,
+  30% {
+    stroke-dashoffset: 100;
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-annotate path,
+  .fx-annotate .fx-annotate-line {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 1;
   }
 }

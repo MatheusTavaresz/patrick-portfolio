@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, Instrument_Sans, Instrument_Serif } from "next/font/google";
 import Script from "next/script";
+import { PortfolioView, WhenDetailed } from "@/components/portfolio-view";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { chrome, homeHref, navigation, profile } from "@/lib/profile";
@@ -67,16 +68,20 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           {chrome.skipLabel}
         </a>
-        <SiteHeader
-          brand={profile.brand}
-          homeHref={homeHref}
-          items={navigation}
-          labels={chrome}
-        />
-        <main id={chrome.mainId} className="flex-1">
-          {children}
-        </main>
-        <SiteFooter />
+        <PortfolioView>
+          <SiteHeader
+            brand={profile.brand}
+            homeHref={homeHref}
+            items={navigation}
+            labels={chrome}
+          />
+          <main id={chrome.mainId} className="flex-1">
+            {children}
+          </main>
+          <WhenDetailed>
+            <SiteFooter />
+          </WhenDetailed>
+        </PortfolioView>
       </body>
     </html>
   );

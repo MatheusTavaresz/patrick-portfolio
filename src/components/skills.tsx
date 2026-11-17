@@ -21,6 +21,7 @@ export function Skills({ section }: SkillsProps) {
           {section.groups.map((group) => (
             <div
               key={group.area}
+              data-reveal
               className="grid gap-2 border-b border-line py-6 last:border-b-0 md:grid-cols-12 md:gap-8 md:py-5"
             >
               <h3 className="font-serif text-2xl tracking-tight md:col-span-4">

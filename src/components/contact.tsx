@@ -25,7 +25,7 @@ export function Contact({ section, profile }: ContactProps) {
         />
         <ul className="mt-12 space-y-8">
           {channels.map((channel) => (
-            <li key={channel.label}>
+            <li key={channel.label} data-reveal>
               <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-accent">
                 {channel.label}
               </p>

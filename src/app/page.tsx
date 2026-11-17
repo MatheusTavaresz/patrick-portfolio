@@ -3,6 +3,7 @@ import { Cases } from "@/components/cases";
 import { Contact } from "@/components/contact";
 import { Experience } from "@/components/experience";
 import { Hero } from "@/components/hero";
+import { WhenDetailed } from "@/components/portfolio-view";
 import { Repositories } from "@/components/repositories";
 import { Skills } from "@/components/skills";
 import { profile, sections, type Section } from "@/lib/profile";
@@ -31,5 +32,11 @@ function renderSection(section: Section) {
 }
 
 export default function Home() {
-  return <>{sections.map((section) => renderSection(section))}</>;
+  return sections.map((section) =>
+    section.kind === "hero" ? (
+      renderSection(section)
+    ) : (
+      <WhenDetailed key={section.id}>{renderSection(section)}</WhenDetailed>
+    ),
+  );
 }

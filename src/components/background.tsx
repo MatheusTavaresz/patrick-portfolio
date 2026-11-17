@@ -14,7 +14,7 @@ export function Background({ section }: BackgroundProps) {
         <div className="mt-14 grid gap-12 md:grid-cols-2">
           <ul className="space-y-8">
             {section.education.map((item) => (
-              <li key={item.place}>
+              <li key={item.place} data-reveal>
                 <p className="font-serif text-3xl tracking-tight">{item.place}</p>
                 <p className="mt-2 leading-relaxed text-muted">{item.detail}</p>
               </li>
@@ -26,7 +26,7 @@ export function Background({ section }: BackgroundProps) {
             </h3>
             <ul className="mt-6 space-y-8">
               {section.studies.map((item) => (
-                <li key={item.place}>
+                <li key={item.place} data-reveal>
                   <p className="font-serif text-3xl tracking-tight">{item.place}</p>
                   <p className="mt-2 leading-relaxed text-muted">{item.detail}</p>
                 </li>

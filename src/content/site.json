@@ -4,6 +4,7 @@
     "brand": "Matheus Patrick",
     "role": "Engenharia de Software",
     "discipline": "Engenharia de Software · Full Stack",
+    "focusRole": "Full Stack",
     "location": "Florianópolis, SC — Brasil",
     "linkedin": "https://www.linkedin.com/in/matheus-patrickz/",
     "linkedinLabel": "linkedin.com/in/matheus-patrickz",
@@ -12,7 +13,7 @@
     "nameLines": [
       "Matheus",
       "Patrick",
-      "Tavares"
+      ""
     ]
   },
   "chrome": {
@@ -23,7 +24,9 @@
     "menu": "Menu",
     "close": "Fechar",
     "themeToLight": "Claro",
-    "themeToDark": "Escuro"
+    "themeToDark": "Escuro",
+    "detail": "Detalhado",
+    "focus": "Início"
   },
   "sections": [
     {
