@@ -130,7 +130,7 @@
         {
           "id": "go-ticket-reader",
           "title": "go-ticket-reader",
-          "description": "CLI em Go que lê a camada de texto de um PDF de boleto e imprime a linha digitável de 47 dígitos. A validação de módulo 10 e módulo 11 segue as regras da FEBRABAN. Não usa OCR.",
+          "description": "CLI em Go que lê a camada de texto de um PDF de boleto e imprime a linha digitável de 47 dígitos. A validação de módulo 10 e módulo 11 segue as regras da FEBRABAN.",
           "url": "https://github.com/MatheusTavaresz/go-ticket-reader",
           "stack": ["Go", "FEBRABAN"]
         },
