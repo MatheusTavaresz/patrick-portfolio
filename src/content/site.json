@@ -103,11 +103,23 @@
           "index": "05",
           "title": "Conferência de identidade no pós-venda",
           "context": "O cliente entra em chamada com a equipe de auditoria na Nuvidio. A proposta precisava avançar de status conforme o que essa conversa concluía.",
-          "solution": "Ao encerrar a chamada, o auditor registrava o desfecho na Nuvidio. A plataforma devolvia essa classificação por webhook, e a integração movia o status da proposta de acordo com a chamada, gravando a tag, a validade do link e a falha da API.",
+          "solution": "Ao encerrar a chamada, o auditor registrava o desfecho na Nuvidio. A plataforma devolvia essa classificação por webhook, e a integração movia o status da proposta de acordo com a chamada.",
           "result": "O status da proposta passa a seguir a chamada de auditoria, sem a necessidade de alguem mover a proposta manualmente.",
           "tools": [
             "Nuvidio",
             "Webhook"
+          ]
+        },
+        {
+          "id": "rastreabilidade",
+          "index": "06",
+          "title": "Rastreio da atuação na proposta",
+          "context": "O usuário precisava ter rastreabilidade de suas ações na plataforma para que a gestão pudesse entender o que está acontecendo na atuação do operacional na proposta.",
+          "solution": "Um mecanismo registra quando o usuário entra na proposta e quando a movimenta.",
+          "result": "Os gestores de cada área medem a atuação dos colaboradores. Os mesmos eventos sustentam métricas de horas trabalhadas e de gargalos operacionais.",
+          "tools": [
+            "Eventos",
+            "Métricas"
           ]
         }
       ]
