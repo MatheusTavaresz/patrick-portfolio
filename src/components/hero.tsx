@@ -14,6 +14,7 @@ export function Hero({ section, profile }: HeroProps) {
   return (
     <section
       id={section.id}
+      data-hero
       className="relative isolate flex min-h-[calc(100svh-4.75rem)] items-center border-b border-line bg-background"
     >
       <div className="absolute inset-0 overflow-hidden" aria-hidden="true">

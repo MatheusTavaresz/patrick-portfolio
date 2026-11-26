@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { usePortfolioView } from "@/components/portfolio-view";
 import { navigation } from "@/lib/profile";
 
@@ -40,9 +40,15 @@ const sectionIcons: Record<string, () => React.JSX.Element> = {
 };
 
 export function SectionDial() {
-  const { activeId, openSection } = usePortfolioView();
+  const { activeId, fanClose, openSection } = usePortfolioView();
   const toggleRef = useRef<HTMLInputElement>(null);
   const origin = "left-1/2 top-[calc(100%-2.1rem)]";
+
+  useEffect(() => {
+    if (toggleRef.current) {
+      toggleRef.current.checked = false;
+    }
+  }, [fanClose]);
 
   function choose(id: string) {
     if (toggleRef.current) {

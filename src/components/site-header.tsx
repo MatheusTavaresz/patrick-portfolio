@@ -22,7 +22,7 @@ type SiteHeaderProps = {
 export function SiteHeader({ brand, homeHref, items, labels }: SiteHeaderProps) {
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState("");
-  const { view, showDetail, showFocus, openSection } = usePortfolioView();
+  const { view, activeId, showDetail, showFocus, openSection } = usePortfolioView();
   const detailed = view === "detail";
 
   useEffect(() => {
@@ -68,10 +68,11 @@ export function SiteHeader({ brand, homeHref, items, labels }: SiteHeaderProps) 
       <Container className="flex items-center justify-between py-4">
         <a
           href={homeHref}
-          className="font-serif text-xl tracking-tight"
+          className="shrink-0 font-serif text-xl tracking-tight"
           onClick={(event) => {
             event.preventDefault();
-            scrollWithoutHash(homeHref);
+            setOpen(false);
+            showFocus();
           }}
         >
           {brand}
@@ -83,35 +84,59 @@ export function SiteHeader({ brand, homeHref, items, labels }: SiteHeaderProps) 
               !detailed
                 ? "hidden"
                 : open
-                  ? "absolute inset-x-0 top-full border-b border-line bg-background px-5 py-5 md:static md:inset-auto md:border-0 md:bg-transparent md:p-0"
-                  : "hidden md:block"
+                  ? "absolute inset-x-0 top-full border-b border-line bg-background px-5 py-5 lg:static lg:inset-auto lg:border-0 lg:bg-transparent lg:p-0"
+                  : "hidden lg:block"
             }
           >
-            <ul className="flex flex-col gap-4 md:flex-row md:items-center md:gap-7">
-              {items.map((item) => (
-                <li key={item.href}>
-                  <a
-                    href={item.href}
-                    className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted transition-colors hover:text-foreground"
-                    onClick={(event) => {
-                      event.preventDefault();
-                      setOpen(false);
-                      openSection(item.href.slice(1));
-                    }}
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
+            <ul className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-7">
+              {items.map((item) => {
+                const id = item.href.slice(1);
+                const current = activeId === id;
+                return (
+                  <li key={item.href}>
+                    <a
+                      href={item.href}
+                      aria-current={current ? "true" : undefined}
+                      className={`font-mono text-[11px] uppercase tracking-[0.16em] transition-colors hover:text-foreground ${
+                        current ? "text-accent" : "text-muted"
+                      }`}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        setOpen(false);
+                        openSection(id);
+                      }}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
-          <button
-            type="button"
-            className="cursor-pointer font-mono text-[11px] uppercase tracking-[0.16em] text-muted transition-colors hover:text-foreground"
-            onClick={detailed ? showFocus : showDetail}
-          >
-            {detailed ? labels.focus : labels.detail}
-          </button>
+          <div className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.16em]">
+            <button
+              type="button"
+              aria-pressed={!detailed}
+              className={detailed ? "cursor-pointer text-muted transition-colors hover:text-foreground" : "text-accent"}
+              onClick={() => {
+                setOpen(false);
+                showFocus();
+              }}
+            >
+              {labels.focus}
+            </button>
+            <button
+              type="button"
+              aria-pressed={detailed}
+              className={detailed ? "text-accent" : "cursor-pointer text-muted transition-colors hover:text-foreground"}
+              onClick={() => {
+                setOpen(false);
+                showDetail();
+              }}
+            >
+              {labels.detail}
+            </button>
+          </div>
           <button
             type="button"
             className="relative grid size-9 cursor-pointer place-items-center overflow-hidden border border-line text-muted transition-colors hover:border-foreground hover:text-foreground"
@@ -131,7 +156,7 @@ export function SiteHeader({ brand, homeHref, items, labels }: SiteHeaderProps) 
           </button>
           <button
             type="button"
-            className={`font-mono text-[11px] uppercase tracking-[0.16em] md:hidden ${detailed ? "" : "hidden"}`}
+            className={`font-mono text-[11px] uppercase tracking-[0.16em] lg:hidden ${detailed ? "" : "hidden"}`}
             aria-expanded={open}
             aria-controls="site-menu"
             onClick={() => setOpen((current) => !current)}
@@ -142,11 +167,6 @@ export function SiteHeader({ brand, homeHref, items, labels }: SiteHeaderProps) 
       </Container>
     </header>
   );
-}
-
-function scrollWithoutHash(href: string) {
-  document.querySelector(href)?.scrollIntoView();
-  history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
 }
 
 function SunIcon() {

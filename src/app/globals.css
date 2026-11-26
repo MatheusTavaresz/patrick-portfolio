@@ -82,6 +82,10 @@ section[id] {
   scroll-margin-top: 5.5rem;
 }
 
+html[data-view="detail"] [data-hero] {
+  min-height: auto;
+}
+
 @keyframes text-rise {
   from {
     opacity: 0;
