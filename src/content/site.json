@@ -49,9 +49,9 @@
           "id": "boletos",
           "index": "01",
           "title": "Engine de extração de boletos e faturas",
-          "context": "A operação pagava licença tarifada por página processada em software externo e dependia de conferência manual lenta para alimentar o ERP.",
+          "context": "A consulta do boleto e a digitação dos dados eram manuais. Cada documento era lido e lançado à mão para alimentar a ficha da proposta.",
           "solution": "Implementação de um motor interno que prioriza a extração direta dos vetores de texto do PDF estruturado, validando linha digitável, código de barras e datas pelas diretrizes formais da FEBRABAN. Desenvolvi um pipeline de fallback em OCR via Tesseract.js estritamente para arquivos rasterizados ou fotos de baixa resolução.",
-          "result": "Eliminação do custo por uso externo, previsibilidade de infraestrutura e queda do tempo de preenchimento de mais de 1 minuto para no máximo 20 segundos.",
+          "result": "A consulta e a digitação deixaram de ser manuais. O preenchimento caiu de mais de 1 minuto para no máximo 20 segundos, tendo uma media de resposta de 8 segundos.",
           "tools": [
             "PHP",
             "Parser PDF",
@@ -183,7 +183,7 @@
             "Automação de fluxos analíticos por integração de APIs, substituindo decisão manual.",
             "Funcionalidades para otimizar o tempo de atuação e a eficiência operacional dos setores da empresa.",
             "Integração com o Serasa Experian para cobrança: geração de remessa em formato posicional e processamento do retorno via SFTP.",
-            "Extração própria de boletos e faturas, com leitura de texto do PDF, validação FEBRABAN e fallback em Tesseract.js para documentos escaneados. O preenchimento caiu de mais de 1 minuto para no máximo 20 segundos, sem cobrança por página.",
+            "Extração própria de boletos e faturas, com leitura de texto do PDF, validação FEBRABAN e fallback em Tesseract.js para documentos escaneados. A consulta e a digitação deixaram de ser manuais, e o preenchimento caiu de mais de 1 minuto para no máximo 20 segundos.",
             "Consulta de processos judiciais ligada à proposta: busca por documento e por termos restritivos, gravação do resultado, PDF da consulta e reprovação automática quando há processo impeditivo.",
             "O cliente fala com a auditoria na Nuvidio. O desfecho registrado na Judit volta por webhook e a proposta avança de status conforme a chamada.",
             "Documentação técnica em Markdown para transformar fluxos operacionais em base de contexto para o time e para LLMs."
