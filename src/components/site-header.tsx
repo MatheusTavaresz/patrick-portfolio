@@ -113,28 +113,30 @@ export function SiteHeader({ brand, homeHref, items, labels }: SiteHeaderProps) 
               })}
             </ul>
           </nav>
-          <div className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.16em]">
+          <div className="flex items-center gap-2">
             <button
               type="button"
+              aria-label={labels.focus}
               aria-pressed={!detailed}
-              className={detailed ? "cursor-pointer text-muted transition-colors hover:text-foreground" : "text-accent"}
+              className={viewButtonClass(!detailed)}
               onClick={() => {
                 setOpen(false);
                 showFocus();
               }}
             >
-              {labels.focus}
+              <HomeIcon />
             </button>
             <button
               type="button"
+              aria-label={labels.detail}
               aria-pressed={detailed}
-              className={detailed ? "text-accent" : "cursor-pointer text-muted transition-colors hover:text-foreground"}
+              className={viewButtonClass(detailed)}
               onClick={() => {
                 setOpen(false);
                 showDetail();
               }}
             >
-              {labels.detail}
+              <DetailIcon />
             </button>
           </div>
           <button
@@ -166,6 +168,48 @@ export function SiteHeader({ brand, homeHref, items, labels }: SiteHeaderProps) 
         </div>
       </Container>
     </header>
+  );
+}
+
+function viewButtonClass(on: boolean) {
+  return `grid size-9 cursor-pointer place-items-center border transition-colors ${
+    on
+      ? "border-accent text-accent"
+      : "border-line text-muted hover:border-foreground hover:text-foreground"
+  }`;
+}
+
+function HomeIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="size-5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinejoin="round"
+    >
+      <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1Z" />
+    </svg>
+  );
+}
+
+function DetailIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="size-5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="4" y="3.5" width="16" height="17" rx="1.5" />
+      <path d="M8 8.5h8M8 12h8M8 15.5h5" />
+    </svg>
   );
 }
 
